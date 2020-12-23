@@ -2,44 +2,55 @@ import * as vscode from 'vscode';
 import { spawn, exec } from 'child_process';
 import * as path from 'path';
 
+interface CustomOption {
+    renderOptionName: string,
+    outputFormat: string, 
+    cliOptions: string
+}
+
 var pandocOutputChannel = vscode.window.createOutputChannel('Pandoc');
 
-function setStatusBarText(what, docType) {
+function setStatusBarText(what: string, docType: string) {
     var date = new Date();
     var text = what + ' [' + docType + '] ' + date.toLocaleTimeString();
     vscode.window.setStatusBarMessage(text, 1500);
 }
 
-function getPandocOptions(quickPickLabel) {
-    var pandocOptions;
+function getPandocOptions(quickPickLabel: string, customOptionsByName: Map<string, CustomOption>) {
+    var pandocOptions: string;
+
+    if (customOptionsByName.has(quickPickLabel)) {
+        console.log(quickPickLabel + 'OptString = ' + pandocOptions);
+        return customOptionsByName.get(quickPickLabel).cliOptions;
+    }
 
     switch (quickPickLabel) {
         case 'pdf':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('pdfOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.pdfOptString');
             console.log('pdocOptstring = ' + pandocOptions);
             break;
         case 'docx':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('docxOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.docxOptString');
             console.log('pdocOptstring = ' + pandocOptions);
             break;
         case 'html':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('htmlOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.htmlOptString');
             console.log('pdocOptstring = ' + pandocOptions);
             break;
         case 'asciidoc':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('asciidocOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.asciidocOptString');
             console.log('pdocOptstring = ' + pandocOptions);
             break;
         case 'docbook':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('docbookOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.docbookOptString');
             console.log('pdocOptstring = ' + pandocOptions);
             break;
         case 'epub':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('epubOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.epubOptString');
             console.log('pdocOptstring = ' + pandocOptions);
             break;
         case 'rst':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('rstOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.rstOptString');
             console.log('pdocOptstring = ' + pandocOptions);
             break;
     }
@@ -84,25 +95,56 @@ export function activate(context: vscode.ExtensionContext) {
         var fileNameOnly = path.parse(fileName).name;
 
         let items: vscode.QuickPickItem[] = [];
-        items.push({ label: 'pdf', description: 'Render as pdf document' });
-        items.push({ label: 'docx', description: 'Render as word document' });
-        items.push({ label: 'html', description: 'Render as html document' });
-        items.push({ label: 'asciidoc', description: 'Render as asciidoc document' });
-        items.push({ label: 'docbook', description: 'Render as docbook document' });
-        items.push({ label: 'epub', description: 'Render as epub document' });
-        items.push({ label: 'rst', description: 'Render as rst document' });
+        if (vscode.workspace.getConfiguration('pandoc').get('output.pdfEnableDefault')) {
+            items.push({ label: 'pdf', description: 'Render as pdf document' });
+        }
+        if (vscode.workspace.getConfiguration('pandoc').get('output.docxEnableDefault')) {
+            items.push({ label: 'docx', description: 'Render as word document' });
+        }
+        if (vscode.workspace.getConfiguration('pandoc').get('output.htmlEnableDefault')) {
+            items.push({ label: 'html', description: 'Render as html document' });
+        }
+        if (vscode.workspace.getConfiguration('pandoc').get('output.asciidocEnableDefault')) {
+            items.push({ label: 'asciidoc', description: 'Render as asciidoc document' });
+        }
+        if (vscode.workspace.getConfiguration('pandoc').get('output.docbookEnableDefault')) {
+            items.push({ label: 'docbook', description: 'Render as docbook document' });
+        }
+        if (vscode.workspace.getConfiguration('pandoc').get('output.epubEnableDefault')) {
+            items.push({ label: 'epub', description: 'Render as epub document' });
+        }
+        if (vscode.workspace.getConfiguration('pandoc').get('output.rstEnableDefault')) {
+            items.push({ label: 'rst', description: 'Render as rst document' });
+        }
+        
+        let customOptionsByName = new Map();
+        let customOptions: Array<CustomOption>
+
+        customOptions = vscode.workspace.getConfiguration('pandoc').get('output.customValues')
+
+        customOptions.forEach(element => {
+            customOptionsByName.set(element.renderOptionName, element)
+            items.push({ label: element.renderOptionName, description: 'Use custom options for ' + element.renderOptionName });
+        });
+
 
         vscode.window.showQuickPick(items).then((qpSelection) => {
             if (!qpSelection) {
                 return;
             }
+            
+            var customOptionUsed = customOptionsByName.has(qpSelection.label);
+            var outputFormat = qpSelection.label;
+            if (customOptionUsed) {
+                outputFormat = customOptionsByName.get(qpSelection.label).outputFormat;
+            }
 
             var inFile = path.join(filePath, fileName).replace(/(^.*$)/gm, "\"" + "$1" + "\"");
-            var outFile = (path.join(filePath, fileNameOnly) + '.' + qpSelection.label).replace(/(^.*$)/gm, "\"" + "$1" + "\"");
+            var outFile = (path.join(filePath, fileNameOnly) + '.' + outputFormat).replace(/(^.*$)/gm, "\"" + "$1" + "\"");
 
             setStatusBarText('Generating', qpSelection.label);
 
-            var pandocOptions = getPandocOptions(qpSelection.label);
+            var pandocOptions = getPandocOptions(qpSelection.label, customOptionsByName);
 
             // debug
             console.log('debug: outFile = ' + inFile);

@@ -39,37 +39,72 @@
 					"default": "",
 					"description": "pandoc executable location"
 				},
-				"pandoc.pdfOptString": {
+				"pandoc.output.pdfEnableDefault": {
+					"type": "boolean",
+					"default": "true",
+					"description": "enable the default render option for pdf"
+				},
+				"pandoc.output.docxEnableDefault": {
+					"type": "boolean",
+					"default": "true",
+					"description": "enable the default render option for docx"
+				},
+				"pandoc.output.htmlEnableDefault": {
+					"type": "boolean",
+					"default": "true",
+					"description": "enable the default render option for html"
+				},
+				"pandoc.output.asciidocEnableDefault": {
+					"type": "boolean",
+					"default": "true",
+					"description": "enable the default render option for asciidoc"
+				},
+				"pandoc.output.docbookEnableDefault": {
+					"type": "boolean",
+					"default": "true",
+					"description": "enable the default render option for xml"
+				},
+				"pandoc.output.epubEnableDefault": {
+					"type": "boolean",
+					"default": "true",
+					"description": "enable the default render option for epub"
+				},
+				"pandoc.output.rstEnableDefault": {
+					"type": "boolean",
+					"default": "true",
+					"description": "enable the default render option for rst"
+				},
+				"pandoc.output.pdfOptString": {
 					"type": "string",
 					"default": "",
 					"description": "pandoc .pdf output option template that you would like to use"
 				},
-				"pandoc.docxOptString": {
+				"pandoc.output.docxOptString": {
 					"type": "string",
 					"default": "",
 					"description": "pandoc .docx output option template that you would like to use"
 				},
-				"pandoc.htmlOptString": {
+				"pandoc.output.htmlOptString": {
 					"type": "string",
 					"default": "",
 					"description": "pandoc .html output option template that you would like to use"
 				},
-				"pandoc.asciidocOptString": {
+				"pandoc.output.asciidocOptString": {
 					"type": "string",
 					"default": "",
 					"description": "pandoc .asciidoc output option template that you would like to use"
 				},
-				"pandoc.docbookOptString": {
+				"pandoc.output.docbookOptString": {
 					"type": "string",
 					"default": "",
 					"description": "pandoc .xml output option template that you would like to use"
 				},
-				"pandoc.epubOptString": {
+				"pandoc.output.epubOptString": {
 					"type": "string",
 					"default": "",
 					"description": "pandoc .epub output option template that you would like to use"
 				},
-				"pandoc.rstOptString": {
+				"pandoc.output.rstOptString": {
 					"type": "string",
 					"default": "",
 					"description": "pandoc .rst output option template that you would like to use"
@@ -78,6 +113,45 @@
 					"type": "boolean",
 					"default": "true",
 					"description": "specify if the extension will open the rendered document in it's default viewer"
+				},
+				"pandoc.output.customValues": {
+					"type": "array",
+					"default": [],
+					"items": {
+						"type": "object",
+						"default": {
+							"renderOptionName": "Custom PDF",
+							"outputFormat": "pdf",
+							"cliOptions": ""
+						},
+						"description": "",
+						"properties": {
+							"renderOptionName": {
+								"type": "string",
+								"default": "PDF",
+								"description": "name of the rendering command"
+							},
+							"outputFormat": {
+								"type": "string",
+								"enum": [
+									"pdf",
+									"docx",
+									"html",
+									"asciidoc",
+									"xml",
+									"epub",
+									"rst"
+								],
+								"default": "pdf",
+								"description": "output format"
+							},
+							"cliOptions": {
+								"type": "string",
+								"default": "",
+								"description": "custom pandoc output option template that you would like to use"
+							}
+						}
+					}
 				}
 			}
 		},
