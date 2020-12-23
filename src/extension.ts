@@ -26,31 +26,31 @@ function getPandocOptions(quickPickLabel: string, customOptionsByName: Map<strin
 
     switch (quickPickLabel) {
         case 'pdf':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.pdfOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.pdfOptString') as string;
             console.log('pdocOptstring = ' + pandocOptions);
             break;
         case 'docx':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.docxOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.docxOptString') as string;
             console.log('pdocOptstring = ' + pandocOptions);
             break;
         case 'html':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.htmlOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.htmlOptString') as string;
             console.log('pdocOptstring = ' + pandocOptions);
             break;
         case 'asciidoc':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.asciidocOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.asciidocOptString') as string;
             console.log('pdocOptstring = ' + pandocOptions);
             break;
         case 'docbook':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.docbookOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.docbookOptString') as string;
             console.log('pdocOptstring = ' + pandocOptions);
             break;
         case 'epub':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.epubOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.epubOptString') as string;
             console.log('pdocOptstring = ' + pandocOptions);
             break;
         case 'rst':
-            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.rstOptString');
+            pandocOptions = vscode.workspace.getConfiguration('pandoc').get('output.rstOptString') as string;
             console.log('pdocOptstring = ' + pandocOptions);
             break;
     }
@@ -120,7 +120,7 @@ export function activate(context: vscode.ExtensionContext) {
         let customOptionsByName = new Map();
         let customOptions: Array<CustomOption>
 
-        customOptions = vscode.workspace.getConfiguration('pandoc').get('output.customValues')
+        customOptions = vscode.workspace.getConfiguration('pandoc').get('output.customValues') as CustomOption[]
 
         customOptions.forEach(element => {
             customOptionsByName.set(element.renderOptionName, element)
